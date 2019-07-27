@@ -29,10 +29,10 @@ async def reload(ctx, extension):
     client.load_extension(f'cogs.{extension}')
     await ctx.send(f'{extension} reloaded!')
 
-@client.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        pass
+#@client.event
+#async def on_command_error(ctx, error):
+    #if isinstance(error, commands.CommandNotFound):
+        #pass
 
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):

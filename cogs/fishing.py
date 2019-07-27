@@ -1,8 +1,11 @@
 import discord
 from discord.ext import commands
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import data
+import math
+import random
+from numpy.random import choice
 
 class Fishing(commands.Cog):
     def __init__(self, client):
@@ -15,14 +18,23 @@ class Fishing(commands.Cog):
     @commands.command()
     async def fish(self, ctx):
         await ctx.send('reel casted!')
-        time.sleep(2)
+        time.sleep(random.randint(1, 2))
         data.ready_fish[ctx.author] = datetime.now()
-        await ctx.send('something\'s on the line!')
+        await ctx.send(f'{ctx.author.mention}! something\'s on the line!')
 
     @commands.command()
-    async def reel(self, ctx):
+    async def theguild(self, ctx):
+        await ctx.send(f'your guild is {ctx.guild.members}.')
+
+    @commands.command()
+    async def catch(self, ctx):
+        catch = choice(data.fish_types[0], 1, data.fish_odds[0])[0]
         if ctx.author in data.ready_fish.keys():
-            await ctx.send(f':fishing_pole_and_fish: fish caught! \n wow that took {datetime.now() - data.ready_fish[ctx.author]}')
+            odds = math.exp(-(datetime.now() - data.ready_fish[ctx.author]).total_seconds()/25)
+            if random.random() < odds:
+                await ctx.send(f'you caught a {catch["name"]}! {catch["emoji"]}\n{catch["points"]} points earned\n{catch["money"]} money earned')
+            else:
+                await ctx.send(f'dang! it got away!')
             data.ready_fish.pop(ctx.author, None)
         else:
             await ctx.send('there\'s nothing to reel in yet.' )
