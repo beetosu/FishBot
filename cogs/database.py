@@ -32,7 +32,33 @@ class Database(commands.Cog):
         conn_g.close()
         await ctx.send('creation complete!')
 
+    @commands.command()
+    async def stats(self, ctx):
+        conn_p = sqlite3.connect('databases/players.db')
+        conn_g = sqlite3.connect('databases/guild_players.db')
+        cur_p = conn_p.cursor()
+        cur_g = conn_g.cursor()
+        id = cur_g.execute('SELECT * FROM server_' + str(ctx.guild.id) + ' WHERE username=' + str(ctx.author.id))
+        for q in id:
+            player = cur_p.execute('SELECT * FROM users WHERE id=' + str(q[1]))
+        for i in player:
+            await ctx.send(f'your current rod is: {i[1]}\nyour reel length is: {i[3]}\nyour bait is: {i[4]}\nyou have {i[5]} coins\nyour total points is: {i[6]}')
+        conn_p.close()
+        conn_g.close()
 
+    @commands.command()
+    async def clear(self, ctx):
+        conn_p = sqlite3.connect('databases/players.db')
+        conn_g = sqlite3.connect('databases/guild_players.db')
+        cur_p = conn_p.cursor()
+        cur_g = conn_g.cursor()
+        id = cur_g.execute('SELECT * FROM server_' + str(ctx.guild.id) + ' WHERE username=' + str(ctx.author.id))
+        for q in id:
+            cur_p.execute('UPDATE users SET rod = "Wooden Pole", reel_max = 1, reel = 1, bait = "none", money = 0, points = 0 WHERE id = ' + str(q[1]))
+        conn_p.commit()
+        conn_p.close()
+        conn_g.close()
+        await ctx.send(f'{ctx.author.nick} data cleared')
 
 
 def setup(client):
