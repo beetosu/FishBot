@@ -6,6 +6,7 @@ import data
 import math
 import random
 import sqlite3
+import asyncio
 from numpy.random import choice
 
 class Fishing(commands.Cog):
@@ -16,44 +17,45 @@ class Fishing(commands.Cog):
     async def on_ready(self):
         print('fishing is online')
 
+    #the actual, like fishing
     @commands.command()
     async def fish(self, ctx):
         await ctx.send('reel casted!')
+        #how long to wait before something bites
         time.sleep(random.randint(1, 2))
-        data.ready_fish[ctx.author] = datetime.now()
-        await ctx.send(f'{ctx.author.mention}! something\'s on the line!\ntype ";catch" to reel it in!')
-
-    @commands.command()
-    async def theguild(self, ctx):
-        await ctx.send(f'your guild is {ctx.guild.members}.')
-
-    @commands.command()
-    async def catch(self, ctx):
+        await ctx.send(f'{ctx.author.mention}! something\'s on the line!\ntype "catch" to reel it in!')
+        #what fish is caught, based on rarity
         catch = choice(data.fish_types[0], 1, data.fish_odds[0])[0]
-        if ctx.author in data.ready_fish.keys():
-            odds = math.exp(-(datetime.now() - data.ready_fish[ctx.author]).total_seconds()/25)
+        #the time something is caught
+        baseTime = datetime.now()
+        #makes sure the message is correct
+        def catch_check(msg):
+            return msg.content == "catch"
+        try:
+            #hold until catch is typed by the user or a minute passes
+            #[does this take into account author??]
+            resp = await self.client.wait_for('message', check=catch_check, timeout=60.0)
+        except asyncio.TimeoutError:
+            #if a minute passes, the fish leaves
+            await ctx.send("oop it went away")
+        else:
+            #the odds of catching are calculated based on response time
+            odds = math.exp(-(datetime.now() - baseTime).total_seconds()/25)
             if random.random() < odds:
                 conn_p = sqlite3.connect('databases/players.db')
-                conn_g = sqlite3.connect('databases/guild_players.db')
                 cur_p = conn_p.cursor()
-                cur_g = conn_g.cursor()
-                id = cur_g.execute('SELECT * FROM server_' + str(ctx.guild.id) + ' WHERE username=' + str(ctx.author.id))
-                for q in id:
-                    actual_id = str(q[1])
-                    player = cur_p.execute('SELECT * FROM users WHERE id=' + str(q[1]))
+                player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
                 for i in player:
                     new_coins = str(int(i[5]) + catch["money"])
                     new_points = str(int(i[6]) + catch["points"])
-                    cur_p.execute('UPDATE users SET money = ' + new_coins + ', points = ' + new_points + ' WHERE id =' + actual_id)
+                    cur_p.execute('UPDATE users SET money = ' + new_coins + ', points = ' + new_points + ' WHERE id ="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
                 conn_p.commit()
                 conn_p.close()
-                conn_g.close()
-                await ctx.send(f'you caught a {catch["name"]}! {catch["emoji"]}\n{catch["points"]} points earned\n{catch["money"]} money earned')
+                await ctx.send(f'{catch["emoji"]}')
+                await ctx.send(f'you caught a {catch["name"]}!\n{catch["points"]} points earned\n{catch["money"]} money earned')
             else:
-                await ctx.send(f'dang! it got away!')
-            data.ready_fish.pop(ctx.author, None)
-        else:
-            await ctx.send('there\'s nothing to reel in yet.' )
+                await ctx.send(f'fuuuck got away')
+
 
 def setup(client):
     client.add_cog(Fishing(client))
