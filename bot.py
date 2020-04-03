@@ -51,4 +51,4 @@ for filename in os.listdir('./cogs'):
         client.load_extension(f'cogs.{filename[:-3]}')
         print(f'{filename} loaded')
 
-client.run("NTA1MTM1NzcyMDI3MDYwMjI0.XlLWNA.-YM6S0GhWaxX6lLc14baffXGAv0")
+client.run(os.environ.get('FISH_KEY'))
