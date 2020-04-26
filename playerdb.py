@@ -7,6 +7,3 @@ def create_player(player, guild):
     conn_p.commit()
     print("[DATABASE] " + i.nick + " of guild " + guild.name + " added to database")
     conn_p.close()
-
-def ping():
-    print("connection is here!")

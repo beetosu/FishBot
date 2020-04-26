@@ -43,8 +43,10 @@ class Fishing(commands.Cog):
                 conn_p = sqlite3.connect('databases/players.db')
                 cur_p = conn_p.cursor()
                 player = cur_p.execute('SELECT 1 FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
-                print("the rowcount is " + str(player.rowcount))
-                if player.rowcount == -1:
+                counting = 0
+                for i in player:
+                    counting += 1
+                if counting == -1:
                     playerdb.create_player(ctx.author, ctx.guild)
                     player = cur_p.execute('SELECT 1 FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
                 for i in player:
