@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import time, math, random
 import sqlite3
 import asyncio
-import data, database
+import data, playerdb
 from numpy.random import choice
 
 class Fishing(commands.Cog):
@@ -14,7 +14,7 @@ class Fishing(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('fishing is online')
-        database.ping()
+        playerdb.ping()
 
     #the actual, like fishing
     @commands.command()
