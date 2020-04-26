@@ -25,7 +25,7 @@ class Database(commands.Cog):
         points: points currently possessed
     WARNING: doesn't currently override whatever db currently exists
     TO DO: maybe fix that??
-    '''
+
     @commands.command()
     async def createdb(self, ctx):
         conn_p = sqlite3.connect('databases/players.db')
@@ -36,6 +36,7 @@ class Database(commands.Cog):
         conn_p.close()
         print("database established")
         await ctx.send('creation complete!')
+    '''
 
     #get current player stats
     @commands.command()
