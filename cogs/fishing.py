@@ -50,6 +50,7 @@ class Fishing(commands.Cog):
                     playerdb.create_player(ctx.author, ctx.guild)
                     player = cur_p.execute('SELECT 1 FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
                 for i in player:
+                    print(i)
                     new_coins = str(int(i[5]) + catch["money"])
                     new_points = str(int(i[6]) + catch["points"])
                     cur_p.execute('UPDATE users SET money = ' + new_coins + ', points = ' + new_points + ' WHERE id ="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
