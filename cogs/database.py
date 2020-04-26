@@ -31,16 +31,10 @@ class Database(commands.Cog):
         conn_p = sqlite3.connect('databases/players.db')
         cur_p = conn_p.cursor()
         await ctx.send('databases loaded!')
-        print("hi")
         cur_p.execute('CREATE TABLE IF NOT EXISTS users (id, rod, reel_max, reel, bait, money, points)')
-        print("fugg")
-        for i in ctx.guild.members:
-            print(i.id)
-            if i.id != 505135772027060224:
-                cur_p.execute('INSERT INTO users VALUES ("' + str(i.id) + "_" + str(ctx.guild.id) + '", "Wooden Pole", 1, 1, "none", 0, 0)')
-                await ctx.send(f'{i.name} added!')
         conn_p.commit()
         conn_p.close()
+        print("database established")
         await ctx.send('creation complete!')
 
     #get current player stats
@@ -66,3 +60,14 @@ class Database(commands.Cog):
 
 def setup(client):
     client.add_cog(Database(client))
+
+def ping():
+    print("connection is here!")
+
+def create_player(player, guild):
+    conn_p = sqlite3.connect('databases/players.db')
+    cur_p = conn_p.cursor()
+    cur_p.execute('INSERT INTO users VALUES ("' + str(player.id) + "_" + str(guild.id) + '", "Wooden Pole", 1, 1, "none", 0, 0)')
+    conn_p.commit()
+    print("[DATABASE] " + i.nick + " of guild " + guild.name + " added to database")
+    conn_p.close()

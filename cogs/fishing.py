@@ -1,12 +1,10 @@
 import discord
 from discord.ext import commands
 from datetime import datetime, timedelta
-import time
-import data
-import math
-import random
+import time, math, random
 import sqlite3
 import asyncio
+import data, database
 from numpy.random import choice
 
 class Fishing(commands.Cog):
@@ -16,6 +14,7 @@ class Fishing(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('fishing is online')
+        database.ping()
 
     #the actual, like fishing
     @commands.command()
