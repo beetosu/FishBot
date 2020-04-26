@@ -48,7 +48,7 @@ class Fishing(commands.Cog):
                     counting += 1
                 if counting == 0:
                     playerdb.create_player(ctx.author, ctx.guild)
-                    player = cur_p.execute('SELECT 1 FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+                    player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
                 for i in player:
                     print(i)
                     new_coins = str(int(i[5]) + catch["money"])
