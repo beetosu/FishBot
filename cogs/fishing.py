@@ -46,7 +46,7 @@ class Fishing(commands.Cog):
                 counting = 0
                 for i in player:
                     counting += 1
-                if counting == -1:
+                if counting == 0:
                     playerdb.create_player(ctx.author, ctx.guild)
                     player = cur_p.execute('SELECT 1 FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
                 for i in player:
