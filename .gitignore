@@ -1,3 +1,4 @@
-__pycache__/**
 databases/**
-cogs/__pycache__/**
+**/__pycache__/**
+**/*.db
+**/*.pyc
