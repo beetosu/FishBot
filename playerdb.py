@@ -1,3 +1,5 @@
+import sqlite3
+
 def create_player(player, guild):
     conn_p = sqlite3.connect('databases/players.db')
     cur_p = conn_p.cursor()
