@@ -3,7 +3,7 @@ import os
 from discord.ext import commands
 
 #this is picked jus bc it seems uncommon + quicker than like a double command (helpful for gameplay)
-client = commands.Bot(command_prefix = ";")
+client = commands.Bot(command_prefix = "f!")
 
 '''
 this is what runs all the main commands, and deploys all the non essential commands (cogs)
@@ -13,7 +13,7 @@ unlike the cogs, any addition to this code will have to be deployed by restartin
 #makes bot status changes (might change later lul)
 @client.event
 async def on_ready():
-    await client.change_presence(status=discord.Status.idle, activity=discord.Game('with ur heart'))
+    await client.change_presence(status=discord.Status.idle, activity=discord.Game('type f!fish to start fishing!'))
     print("bot is ready!")
 
 #quick n dirty latency check
@@ -51,4 +51,4 @@ for filename in os.listdir('./cogs'):
         client.load_extension(f'cogs.{filename[:-3]}')
         print(f'{filename} loaded')
 
-client.run(os.environ.get('FISH_KEY'))
+client.run(os.environ.get('FISH_TOKEN'))
