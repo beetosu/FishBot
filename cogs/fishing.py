@@ -14,7 +14,6 @@ class Fishing(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('fishing is online')
-        playerdb.ping()
 
     #the actual, like fishing
     @commands.command()
@@ -43,7 +42,10 @@ class Fishing(commands.Cog):
             if random.random() < odds:
                 conn_p = sqlite3.connect('databases/players.db')
                 cur_p = conn_p.cursor()
-                player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+                player = cur_p.execute('SELECT 1 FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+                if player.rowcount == -1:
+                    playerdb.create_player(ctx.author, ctx.guild)
+                    player = cur_p.execute('SELECT 1 FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
                 for i in player:
                     new_coins = str(int(i[5]) + catch["money"])
                     new_points = str(int(i[6]) + catch["points"])
@@ -53,7 +55,7 @@ class Fishing(commands.Cog):
                 await ctx.send(f'{catch["emoji"]}')
                 await ctx.send(f'you caught a {catch["name"]}!\n{catch["points"]} points earned\n{catch["money"]} money earned')
             else:
-                await ctx.send(f'fuuuck got away')
+                await ctx.send(f'the fish has escaped <a:donkeysad:691789600540196914>')
 
 
 def setup(client):
