@@ -13,7 +13,7 @@ class Fishing(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('fishing is online')
+        print('[SYSTEM] fishing is online')
 
     #the actual, like fishing
     @commands.command()

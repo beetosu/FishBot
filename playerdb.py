@@ -3,7 +3,7 @@ import sqlite3
 def create_player(player, guild):
     conn_p = sqlite3.connect('databases/players.db')
     cur_p = conn_p.cursor()
-    cur_p.execute('INSERT INTO users VALUES ("' + str(player.id) + "_" + str(guild.id) + '", "Wooden Pole", 1, 1, "none", 0, 0)')
+    cur_p.execute('INSERT INTO users VALUES ("' + str(player.id) + "_" + str(guild.id) + '", "Wooden Pole", 1, 1, "none", 0, 0, "' + player.name + '", "' + str(guild.id) + '")')
     conn_p.commit()
     print("[DATABASE] " + player.name + " of guild " + guild.name + " added to database")
     conn_p.close()

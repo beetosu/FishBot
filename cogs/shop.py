@@ -9,7 +9,7 @@ class Shop(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('shop is online')
+        print('[SYSTEM] shop is online')
 
     @commands.command()
     async def shop(self, ctx):

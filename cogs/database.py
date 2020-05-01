@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3
+import playerdb
 
 #this is just handling accessing the database outside of fishing and catching
 
@@ -10,7 +11,7 @@ class Database(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('database is online')
+        print('[SYSTEM] database is online')
 
     '''
     makes the current db by whatever the current needs are
@@ -25,18 +26,17 @@ class Database(commands.Cog):
         points: points currently possessed
     WARNING: doesn't currently override whatever db currently exists
     TO DO: maybe fix that??
-
+    '''
     @commands.command()
     async def createdb(self, ctx):
         conn_p = sqlite3.connect('databases/players.db')
         cur_p = conn_p.cursor()
         await ctx.send('databases loaded!')
-        cur_p.execute('CREATE TABLE IF NOT EXISTS users (id, rod, reel_max, reel, bait, money, points)')
+        cur_p.execute('CREATE TABLE IF NOT EXISTS users (id, rod, reel_max, reel, bait, money, points, name, guild)')
         conn_p.commit()
         conn_p.close()
         print("database established")
         await ctx.send('creation complete!')
-    '''
 
     #get current player stats
     @commands.command()
@@ -44,9 +44,23 @@ class Database(commands.Cog):
         conn_p = sqlite3.connect('databases/players.db')
         cur_p = conn_p.cursor()
         player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+        counting = 0
+        for i in player:
+            counting += 1
+        if counting == 0:
+            playerdb.create_player(ctx.author, ctx.guild)
+        player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
         for i in player:
             await ctx.send(f'your current rod is: {i[1]}\nyour reel length is: {i[3]}\nyour bait is: {i[4]}\nyou have {i[5]} coins\nyour total points is: {i[6]}')
         conn_p.close()
+
+    @commands.command()
+    async def leaderboard(self, ctx):
+        conn_p = sqlite3.connect('databases/players.db')
+        cur_p = conn_p.cursor()
+        players = cur_p.execute('SELECT name, points FROM users WHERE guild="' + str(ctx.guild.id) + '" ORDER BY points ASC')
+        for i in players:
+            await ctx.send(f'{i[0]}: {i[1]} points')
 
     #revert player who envokes this command back to default values
     @commands.command()
