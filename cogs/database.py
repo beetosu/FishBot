@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
-import sqlite3
+import sqlite3, asyncio, json
 import playerdb
-import asyncio
 
 #this is just handling accessing the database outside of fishing and catching
 
@@ -25,6 +24,8 @@ class Database(commands.Cog):
         bait: the bait currently being used by player, if any
         money: $ currently possessed
         points: points currently possessed
+        name: the current name of the user
+        guild: the guild a user is currently in
     WARNING: doesn't currently override whatever db currently exists
     TO DO: maybe fix that??
     '''
@@ -36,7 +37,7 @@ class Database(commands.Cog):
         cur_p.execute('CREATE TABLE IF NOT EXISTS users (id, rod, reel_max, reel, bait, money, points, name, guild)')
         conn_p.commit()
         conn_p.close()
-        print("database established")
+        print("[DATABASE] players.db established")
         await ctx.send('creation complete!')
 
     #get current player stats
@@ -78,9 +79,15 @@ class Database(commands.Cog):
         else:
             conn_p = sqlite3.connect('databases/players.db')
             cur_p = conn_p.cursor()
-            cur_p.execute('UPDATE users SET rod = "Wooden Pole", reel_max = 1, reel = 1, bait = "none", money = 0, points = 0, name = "' + ctx.author.name + '" WHERE id = "' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+            inv = {}
+            cur_p.execute('UPDATE users SET rod = "Sturdy Rod", reel_max = 1, reel = 1, bait = "none", money = 0, points = 0, name = "' + ctx.author.name + '" WHERE id = "' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
             conn_p.commit()
             conn_p.close()
+            conn_i = sqlite3.connect('databases/inv.db')
+            cur_i = conn_i.cursor()
+            cur_i.execute('DELETE FROM user' + str(ctx.author.id) + '_' + str(ctx.guild.id))
+            conn_i.commit()
+            conn_i.close()
             await ctx.send(f'{ctx.author.name} data cleared')
 
 
