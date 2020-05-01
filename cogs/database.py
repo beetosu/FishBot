@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import sqlite3
 import playerdb
+import asyncio
 
 #this is just handling accessing the database outside of fishing and catching
 
@@ -65,12 +66,22 @@ class Database(commands.Cog):
     #revert player who envokes this command back to default values
     @commands.command()
     async def clear(self, ctx):
-        conn_p = sqlite3.connect('databases/players.db')
-        cur_p = conn_p.cursor()
-        cur_p.execute('UPDATE users SET rod = "Wooden Pole", reel_max = 1, reel = 1, bait = "none", money = 0, points = 0 WHERE id = "' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
-        conn_p.commit()
-        conn_p.close()
-        await ctx.send(f'{ctx.author.nick} data cleared')
+        await ctx.send(f'Are you sure you want to clear save data? Cleared data cannot be recovered!\nType "yes" now to confirm.')
+        def make_sure(msg):
+            return msg.content == "yes"
+        try:
+            #hold until user confirms
+            resp = await self.client.wait_for('message', check=make_sure, timeout=30.0)
+        except asyncio.TimeoutError:
+            #if half a minute passes, nothing is cleared
+            await ctx.send("clearing process cancelled")
+        else:
+            conn_p = sqlite3.connect('databases/players.db')
+            cur_p = conn_p.cursor()
+            cur_p.execute('UPDATE users SET rod = "Wooden Pole", reel_max = 1, reel = 1, bait = "none", money = 0, points = 0, name = "' + ctx.author.name + '" WHERE id = "' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+            conn_p.commit()
+            conn_p.close()
+            await ctx.send(f'{ctx.author.name} data cleared')
 
 
 def setup(client):
