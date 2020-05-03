@@ -18,23 +18,33 @@ class Shop(commands.Cog):
                 await ctx.send(str(rod) +  "- $" + str(info["cost"]))
 
     @commands.command()
-    async def buy(self, ctx, item, type):
+    async def buy(self, ctx, item, type, amt=1):
         product = item + " " + type
         if product in data.rods.keys():
             conn = sqlite3.connect('databases/players.db')
             cur = conn.cursor()
-            player = cur.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+            player = cur.execute('SELECT id, money FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+            conn_i = sqlite3.connect('databases/inv.db')
+            cur_i  = conn_i.cursor()
             for i in player:
-                if int(i[5]) < data.rods[product]["cost"]:
+                if int(i[1]) < data.rods[product]["cost"]:
                     await ctx.send("you do not have enough money for " + product)
                     break
-                if i[1] == product:
-                    await ctx.send(product + " already bought!")
-                    break
-                newCoins = str(int(i[5]) - data.rods[product]["cost"])
+                dup = cur_i.execute('SELECT * FROM user' + str(ctx.author.id)  + '_' + str(ctx.guild.id) + ' WHERE name="' + product + '"')
+                if type == "Rod":
+                    for i in dup:
+                        await ctx.send("you already own " + product)
+                        break
+                newCoins = str(int(i[1]) - data.rods[product]["cost"])
                 cur.execute('UPDATE users SET money = ' +  newCoins + ', rod = "' + product + '" WHERE id ="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+                quantity = 0
+                for i in dup:
+                    quantity = int(i[2])
+                cur_i.execute('INSERT INTO user' + str(ctx.author.id) + '_' + str(ctx.guild.id) + ' VALUES ("' + product +  '", "' + type + '", ' + str(quantity+amt) + ')')
                 await ctx.send(product + " purchased!")
+            conn_i.commit()
             conn.commit()
+            conn_i.close()
             conn.close()
         else:
             await ctx.send(product + " not found.")
