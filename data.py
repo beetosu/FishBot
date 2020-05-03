@@ -1,5 +1,7 @@
 ready_fish = {}
 
+structure = [{"useless": 1, "good": 1}]
+
 fish_types = [
     [{"name": "Boot", "emoji": ":boot:", "points": 5, "money":0},
     {"name": "Tuna", "emoji": ":fish:", "points": 5, "money": 10},
@@ -19,10 +21,31 @@ rods = {
     "Sturdy Rod": {
         "desc": "Like the wooden pole, but a little hartier.\nMore forgiving catch rate",
         "attraction": 1,
-        "catch": 2,
+        "catch": 1.5,
         "shop": True,
         "cost": 20
         }
+}
+
+bait = {
+    "Worm": {
+        "desc": "A little worm fella.\ngood at attracting all kinds of fish.",
+        "cost": 1,
+        "useless_attraction": 1,
+        "attraction": 1.2,
+        "rare_attraction": 1.2,
+        "speed": 1.1,
+        "catch": 1
+    },
+    "Toy Fish": {
+        "desc": "A little dangly plastic fish\nLittle spikes make it hard for a fish to detach from it.",
+        "cost": 2,
+        "useless_attraction": 1.1,
+        "attraction": 1.1,
+        "rare_attraction": 1.1,
+        "speed": 1,
+        "catch": 1.3
+    }
 }
 
 reel = [{

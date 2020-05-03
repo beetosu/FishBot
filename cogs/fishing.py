@@ -19,8 +19,22 @@ class Fishing(commands.Cog):
     @commands.command()
     async def fish(self, ctx):
         await ctx.send('reel casted!')
+        conn_p = sqlite3.connect('databases/players.db')
+        cur_p = conn_p.cursor()
+        player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+        counting = 0
+        for i in player:
+            counting += 1
+        if counting == 0:
+            playerdb.create_player(ctx.author, ctx.guild)
+        player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
         #how long to wait before something bites
-        time.sleep(random.randint(1, 2))
+        rod = "Flimsy Rod"
+        for i in player:
+            rod = i[1]
+            money = i[5]
+            points = i[6]
+        time.sleep(random.randint(int(10/data.rods[rod]["attraction"]), int(20/data.rods[rod]["attraction"])))
         await ctx.send(f'{ctx.author.mention}! something\'s on the line!\ntype "catch" to reel it in!')
         #what fish is caught, based on rarity
         catch = choice(data.fish_types[0], 1, data.fish_odds[0])[0]
@@ -38,21 +52,11 @@ class Fishing(commands.Cog):
             await ctx.send("oop it went away")
         else:
             #the odds of catching are calculated based on response time
-            odds = math.exp(-(datetime.now() - baseTime).total_seconds()/25)
+            odds = math.exp(-(datetime.now() - baseTime).total_seconds()/25) * data.rods[rod]["catch"]
             if random.random() < odds:
-                conn_p = sqlite3.connect('databases/players.db')
-                cur_p = conn_p.cursor()
-                player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
-                counting = 0
-                for i in player:
-                    counting += 1
-                if counting == 0:
-                    playerdb.create_player(ctx.author, ctx.guild)
-                player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
-                for i in player:
-                    new_coins = str(int(i[5]) + catch["money"])
-                    new_points = str(int(i[6]) + catch["points"])
-                    cur_p.execute('UPDATE users SET money = ' + new_coins + ', points = ' + new_points + ' WHERE id ="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+                new_coins = str(money + catch["money"])
+                new_points = str(points + catch["points"])
+                cur_p.execute('UPDATE users SET money = ' + new_coins + ', points = ' + new_points + ' WHERE id ="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
                 conn_p.commit()
                 conn_p.close()
                 await ctx.send(f'{catch["emoji"]}')

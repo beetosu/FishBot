@@ -27,7 +27,7 @@ class Shop(commands.Cog):
             conn_i = sqlite3.connect('databases/inv.db')
             cur_i  = conn_i.cursor()
             for i in player:
-                if int(i[1]) < data.rods[product]["cost"]:
+                if int(i[1]) < data.rods[product]["cost"] * amt:
                     await ctx.send("you do not have enough money for " + product)
                     break
                 dup = cur_i.execute('SELECT * FROM user' + str(ctx.author.id)  + '_' + str(ctx.guild.id) + ' WHERE name="' + product + '"')
