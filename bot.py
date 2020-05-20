@@ -33,6 +33,11 @@ async def unload(ctx, extension):
     client.unload_extension(f'cogs.{extension}')
     await ctx.send(f'{extension} unloaded!')
 
+@client.command()
+async def reload(ctx, extension):
+    await unload(ctx, extension)
+    await load(ctx, extension)
+
 #on bot bootup, load every cog
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):

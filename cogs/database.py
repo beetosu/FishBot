@@ -24,7 +24,6 @@ class Database(commands.Cog):
         bait: the bait currently being used by player, if any
         money: $ currently possessed
         points: points currently possessed
-        name: the current name of the user
         guild: the guild a user is currently in
     WARNING: doesn't currently override whatever db currently exists
     TO DO: maybe fix that??
@@ -34,7 +33,7 @@ class Database(commands.Cog):
         conn_p = sqlite3.connect('databases/players.db')
         cur_p = conn_p.cursor()
         await ctx.send('databases loaded!')
-        cur_p.execute('CREATE TABLE IF NOT EXISTS users (id, rod, reel_max, reel, bait, money, points, name, guild)')
+        cur_p.execute('CREATE TABLE IF NOT EXISTS users (id, rod, reel_max, reel, bait, money, points, guild)')
         conn_p.commit()
         conn_p.close()
         print("[DATABASE] players.db established")
@@ -43,26 +42,17 @@ class Database(commands.Cog):
     #get current player stats
     @commands.command()
     async def stats(self, ctx):
-        conn_p = sqlite3.connect('databases/players.db')
-        cur_p = conn_p.cursor()
-        player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
-        counting = 0
-        for i in player:
-            counting += 1
-        if counting == 0:
-            playerdb.create_player(ctx.author, ctx.guild)
-        player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+        player = playerdb.get_player(ctx)
         for i in player:
             await ctx.send(f'your current rod is: {i[1]}\nyour reel length is: {i[3]}\nyour bait is: {i[4]}\nyou have {i[5]} coins\nyour total points is: {i[6]}')
-        conn_p.close()
 
     @commands.command()
     async def leaderboard(self, ctx):
         conn_p = sqlite3.connect('databases/players.db')
         cur_p = conn_p.cursor()
-        players = cur_p.execute('SELECT name, points FROM users WHERE guild="' + str(ctx.guild.id) + '" ORDER BY points ASC')
+        players = cur_p.execute('SELECT id, points FROM users WHERE guild="' + str(ctx.guild.id) + '" ORDER BY points ASC')
         for i in players:
-            await ctx.send(f'{i[0]}: {i[1]} points')
+            await ctx.send(f'{ctx.guild.get_member(int(i[0].split("_")[0])).nick}: {i[1]} points')
 
     #revert player who envokes this command back to default values
     @commands.command()

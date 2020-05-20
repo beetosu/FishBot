@@ -21,23 +21,17 @@ class Fishing(commands.Cog):
         await ctx.send('reel casted!')
         conn_p = sqlite3.connect('databases/players.db')
         cur_p = conn_p.cursor()
-        player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
-        counting = 0
-        for i in player:
-            counting += 1
-        if counting == 0:
-            playerdb.create_player(ctx.author, ctx.guild)
-        player = cur_p.execute('SELECT * FROM users WHERE id="' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
+        player = playerdb.get_player(ctx)
         #how long to wait before something bites
-        rod = "Flimsy Rod"
         for i in player:
             rod = i[1]
+            reel = int(i[3]) - 1
             money = i[5]
             points = i[6]
         time.sleep(random.randint(int(10/data.rods[rod]["attraction"]), int(20/data.rods[rod]["attraction"])))
         await ctx.send(f'{ctx.author.mention}! something\'s on the line!\ntype "catch" to reel it in!')
         #what fish is caught, based on rarity
-        catch = choice(data.fish_types[0], 1, data.fish_odds[0])[0]
+        catch = choice(data.fish_types[reel], 1, data.fish_odds[reel])[0]
         #the time something is caught
         baseTime = datetime.now()
         #makes sure the message is correct

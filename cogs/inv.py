@@ -31,6 +31,7 @@ class Inv(commands.Cog):
         found = False
         for i in thing:
             found = True
+            break
         if found:
             cur_p.execute('UPDATE users SET rod = "' + item + " " + type + '" WHERE id = "' + str(ctx.author.id) + "_" + str(ctx.guild.id) + '"')
             conn_p.commit()
